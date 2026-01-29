@@ -25,7 +25,7 @@ C
 C
 	R       = 1
 C
-	write(6,*), " "
+	write(6, *) " "
 	write(6, '(" nu       = ", 1f10.8)') xnu
 	write(6, '(" xrho     = ", 1f10.8)') xrho
 	write(6, '(" xm       = ", 1f10.8)') xm
@@ -33,19 +33,19 @@ C
 	write(6, '(" xsigma   = ", 1f10.8)') xsigma
 	write(6, '(" xepsilon = ", 1f10.8)') xepsilon
 	write(6, '(" xlambda  = ", 1f10.8)') xlambda
-	write(6,*), " "
+	write(6, *) " "
 C
-	call monodromy(vector1,vector2,idid)
+	call monodromy(vector1, vector2, idid)
 C
 	if (idid.eq.1) then
 		print*, "Enter initial delta, T"
 		read*, xdelta, xT
 		print*, " "
-		call newton(R,vector1,vector2,ierr)
+		call newton(R, vector1, vector2, ierr)
 	else
 	end if
 C
-	if (ierr.eq.1) call postprocess(vector1,vector2)
+	if (ierr.eq.1) call postprocess(vector1, vector2)
 C
       RETURN
       END

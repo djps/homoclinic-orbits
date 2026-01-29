@@ -7,15 +7,21 @@ C
       EXTERNAL USRFUN_M, SOLOUT_M
       PARAMETER (n=6, nrdens=6, lwork=11*n+8*nrdens+20)
       PARAMETER (liwork=nrdens+20, lrpar=1, lipar=1)
-      DIMENSION z(n,n),vector1(n),vector2(n)
+	  PARAMETER (m=10)
+      DIMENSION z(n,n),vector1(m),vector2(m)
       DIMENSION vr(n,n),vi(n,n),vrdum(n,n),vidum(n,n)
       DIMENSION xMonodromy(n,n),xnorm(n),wrdum(n),widum(n)
       DIMENSION fv1(n),y(n)
       DIMENSION wr(n),wi(n),xInitial(n,n),iv1(n)
       DIMENSION rpar(lrpar),ipar(lipar),work(lwork),iwork(liwork)
+
+      DIMENSION xMonodromy_copy(n,n), work_ev(100)
+      INTEGER lwork_ev, info_ev
+      CHARACTER jobvl, jobvr
+
 C
 	x    = 0.d0
-	xend = 4.d0*pi/(1.d0+xnu)
+	xend = 4.d0 * pi / (1.d0 + xnu)
 C
 	itol   = 0
 C
@@ -78,39 +84,67 @@ C
 ! 	do k = 1,n 
 ! 		write(6,100) (xMonodromy(k,i), i=1,n)
 ! 	end do
+
 C
-C Find floquet multiplers
-C       
-	call rg(n,n,xMonodromy,wr,wi,matz,z,iv1,fv1,ierr)
+C Find floquet multipliers using LAPACK DGEEV
+C        
+C --- Copy matrix (DGEEV destroys input)
+	do k = 1,n
+		do i = 1,n
+		xMonodromy_copy(i,k) = xMonodromy(i,k)
+		end do
+	end do
+	
+C --- Setup DGEEV parameters
+	jobvl = 'N'
+	jobvr = 'V'
+	lwork_ev = 100
+	
+C --- Call LAPACK DGEEV instead of EISPACK RG
+	call DGEEV(jobvl, jobvr, n, xMonodromy_copy, n, wr, wi, z, n, z, n, work_ev, lwork_ev, info_ev)
+	
+	ierr = info_ev
 	if (ierr.ne.0) then
-		print*, "argh"
+		write(6,*) " "
+		write(6,*) "DGEEV failed with INFO = ", ierr
+		write(6,*) " "
 		return
 	else
 		idid = 1
 	end if
+
+
+!	call rg(n,n,xMonodromy,wr,wi,matz,z,iv1,fv1,ierr)
+!	if (ierr.ne.0) then
+!		print*, "argh"
+!		return
+!	else
+!		idid = 1
+!	end if
 C
-	if (ierr.ne.0) then
-		write(6,*), " "
-		write(6,*), "failure in eigenvalue, eigenvector solver"
-		write(6,*), " "
-	else
-! 		write(6,*), " "
-! 		write(6,*), "real part of eigenvalues"
+!	if (ierr.ne.0) then
+!		write(6,*) " "
+!		write(6,*) "failure in eigenvalue, eigenvector solver"
+!!	else
+! 		write(6,*) " "
+! 		write(6,*) "real part of eigenvalues"
 ! 		do i = 1,n 
 ! 			write(6,'(1e18.10)') wr(i)
 ! 		end do
-! 		write(6,*), " "
-! 		write(6,*), "imaginary part of eigenvalues"
+! 		write(6,*) " "
+! 		write(6,*) "imaginary part of eigenvalues"
 ! 		do i = 1,n 
 ! 			write(6,'(1e18.10)') wi(i)
 ! 		end do	
-! 		write(6,*), " "
-! 		write(6,*), "magnitude of eigenvalues"
+! 		write(6,*) " "
+! 		write(6,*) "magnitude of eigenvalues"
 ! 		do i = 1,n 
 ! 			write(6,'(1e18.10)') dsqrt(wi(i)**2.d0 + wr(i)**2.d0)
 ! 		end do	
-! 		write(6,*), " "
-	end if
+! 		write(6,*) " "
+!	end if
+
+
 C
 C Create matrices vr, vi from output matrix z
 C
@@ -147,16 +181,16 @@ C
 		end do
 	end do
 C
-! 	write(6,*), "normalised REAL matrix"
+! 	write(6,*) "normalised REAL matrix"
 ! 	do i = 1,n
 ! 		write(6,100) ( vr(i,j), j = 1,n )
 ! 	end do
-! 	write(6,*), " "
-! 	write(6,*), "normalised IMAGINARY matrix"
+! 	write(6,*) " "
+! 	write(6,*) "normalised IMAGINARY matrix"
 ! 	do i = 1,n
 ! 		write(6,100) ( vi(i,j), j = 1,n )
 ! 	end do
-! 	write(6,*), " "
+! 	write(6,*) " "
 C
 C Order vectors according to magnitude of eigenvalues
 C
@@ -181,16 +215,16 @@ C
 		end do
 	end do	
 C
-! 	write(6,*), "final REAL matrix"
+! 	write(6,*) "final REAL matrix"
 ! 	do i = 1,n
 ! 		write(6,100) ( vr(i,j), j = 1,n )
 ! 	end do
-! 	write(6,*), " "
-! 	write(6,*), "final IMAGINARY matrix"
+! 	write(6,*) " "
+! 	write(6,*) "final IMAGINARY matrix"
 ! 	do i = 1,n
 ! 		write(6,100) ( vi(i,j), j = 1,n )
 ! 	end do
-! 	write(6,*), " "
+! 	write(6,*) " "
 C
 C Use real and imaginary parts of complex eigenvectors
 C
@@ -208,19 +242,19 @@ C
 		end do
 	end do
 C
-! 	write(6,*), "final matrix"
+! 	write(6,*) "final matrix"
 ! 	do i = 1,n
 ! 		write(6,100) ( vr(i,j), j = 1,n )
 ! 	end do
-! 	write(6,*), " "
+! 	write(6,*) " "
 ! C
-! 	write(6,*), "required vectors"
+! 	write(6,*) "required vectors"
 ! 	do i = n-1,n
 ! 		write(6,100) ( vr(j,i), j = 1,n  )
 ! 	end do
-! 	write(6,*), " "
+! 	write(6,*) " "
 C
-	do i =1,10
+	do i =1,m
 		vector1(i) = 0.d0
 		vector2(i) = 0.d0
 	end do
@@ -243,12 +277,12 @@ C
 	write(6,'(" real part of eigenvalue             = ", 1e19.10)') (1.d0/(xend*2.d0))*dlog( wi(n)**2.d0 + wr(n)**2.d0 )
 	write(6,'(" imaginary part of eigenvalue        = ", 1e19.10)') ( datan(wi(n)/wr(n)) - 2.d0*pi )/xend
 	write(6,'(" period of multimodals               = ", 1e19.10)') pi - nint(p/pi)*p
-	print*, " "
+	write(6,*) " "
 C
-	write(6,*), "required vectors"
-	write(6,'(10e12.4)') ( vector1(i), i = 1,10 )
-	write(6,'(10e12.4)') ( vector2(i), i = 1,10 )
-	write(6,*), " "
+	write(6,*) "required vectors"
+	write(6,'(10e12.4)') ( vector1(i), i = 1,m )
+	write(6,'(10e12.4)') ( vector2(i), i = 1,m )
+	write(6,*) " "
 C
 100	format(6e12.4)
 C

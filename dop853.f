@@ -848,29 +848,76 @@ C ----  H**IORD * MAX ( NORM (F0), NORM (DER2)) = 0.01
       RETURN
       END 
 C
-      FUNCTION CONTD8(II,X,CON,ICOMP,ND)
-C ----------------------------------------------------------
-C     THIS FUNCTION CAN BE USED FOR CONINUOUS OUTPUT IN CONNECTION
-C     WITH THE OUTPUT-SUBROUTINE FOR DOP853. IT PROVIDES AN
-C     APPROXIMATION TO THE II-TH COMPONENT OF THE SOLUTION AT X.
-C ----------------------------------------------------------
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      DIMENSION CON(8*ND),ICOMP(ND)
-      COMMON /CONDO8/XOLD,H
-C ----- COMPUTE PLACE OF II-TH COMPONENT 
-      I=0 
-      DO 5 J=1,ND 
-      IF (ICOMP(J).EQ.II) I=J
-   5  CONTINUE
-      IF (I.EQ.0) THEN
-         WRITE (6,*) ' NO DENSE OUTPUT AVAILABLE FOR COMP.',II 
-         RETURN
-      END IF  
-      S=(X-XOLD)/H
-      S1=1.D0-S
-      CONPAR=CON(I+ND*4)+S*(CON(I+ND*5)+S1*(CON(I+ND*6)+S*CON(I+ND*7)))
-      CONTD8=CON(I)+S*(CON(I+ND)+S1*(CON(I+ND*2)+S*(CON(I+ND*3)
-     &        +S1*CONPAR)))
-      RETURN
-      END
+
+
+
+      function contd8(ii, x, con, icomp, nd) result(contd8_val)
+
+      !----------------------------------------------------------
+      ! This function provides continuous output for DOP853
+      ! Approximates the II-th component of the solution at X
+      !----------------------------------------------------------
+      
+      implicit none
+      
+      ! Arguments
+      integer, intent(in) :: ii, nd
+      real(8), intent(in) :: x
+      real(8), intent(in) :: con(8*nd)
+      integer, intent(in) :: icomp(nd)
+      real(8) :: contd8_val
+      
+      ! Local variables
+      integer :: i, j
+      real(8) :: s, s1, conpar, xold, h
+      common /condo8/ xold, h
+      
+      ! Find the position of II-th component 
+      i = 0 
+      do j = 1, nd 
+         if (icomp(j) == ii) i = j
+      end do
+      
+      if (i == 0) then
+         write(6,*) ' NO DENSE OUTPUT AVAILABLE FOR COMP.', ii 
+         return
+      end if
+      
+      ! Compute interpolation
+      s = (x - xold) / h
+      s1 = 1.0d0 - s
+      conpar = con(i+nd*4) + s * (con(i+nd*5) + s1 * (con(i+nd*6) + s * con(i+nd*7)))
+      contd8_val = con(i) + s * (con(i+nd) + s1 * (con(i+nd*2) + s * (con(i+nd*3) + s1 * conpar)))
+      
+      end function contd8
+
+
+!      FUNCTION CONTD8(II ,X, CON, ICOMP, ND)
+!C ----------------------------------------------------------
+!C     THIS FUNCTION CAN BE USED FOR CONINUOUS OUTPUT IN CONNECTION
+!C     WITH THE OUTPUT-SUBROUTINE FOR DOP853. IT PROVIDES AN
+!C     APPROXIMATION TO THE II-TH COMPONENT OF THE SOLUTION AT X.
+!C ----------------------------------------------------------
+!      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+!      DIMENSION CON(8*ND),ICOMP(ND)
+!      COMMON /CONDO8/XOLD,H
+
+!C ----- COMPUTE PLACE OF II-TH COMPONENT 
+!      i = 0 
+!      do j = 1, nd 
+!         if (icomp(j) == ii) i = j
+!      end do
+!
+!      if (i == 0) then
+!         write(6,*) ' NO DENSE OUTPUT AVAILABLE FOR COMP.', ii 
+!         return
+!      end if
+
+!      S = (X - XOLD) / H
+!      S1 = 1.D0 - S
+!      CONPAR = CON(I+ND*4)+S*(CON(I+ND*5)+S1*(CON(I+ND*6)+S*CON(I+ND*7)))
+!      CONTD8 = CON(I)+S*(CON(I+ND)+S1*(CON(I+ND*2)+S*(CON(I+ND*3)
+!     &        +S1*CONPAR)))
+!      RETURN
+!      END
 
