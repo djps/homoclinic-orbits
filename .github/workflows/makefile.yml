@@ -16,11 +16,11 @@ jobs:
         python-version: '3.11'
     - name: Install dependencies Linux
       run: |
+        sudo apt update
         sudo apt-get install -y gfortran
         sudo apt-get install -y make libmotif-dev libsoqt520-dev
         sudo apt-get install -y libblas-dev liblapack-dev
         sudo apt-get install auto-97p
-        sudo apt update
         sudo apt python3-matplotlib ipython3
         
     - name: build shooting
