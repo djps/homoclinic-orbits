@@ -10,13 +10,24 @@ jobs:
       fail-fast: false
       
     steps:
-    - name: Install GFortran Linux
+    - name: checkout repo
+      uses: actions/checkout@v3  
+      with:
+        python-version: '3.11'
+    - name: Install dependencies Linux
       run: |
         sudo apt-get install -y gfortran
-        sudo apt-get install libblas-dev liblapack-dev
-    - name: checkout repo
-      uses: actions/checkout@v3    
+        sudo apt-get install -y make libmotif-dev libsoqt520-dev
+        sudo apt-get install -y libblas-dev liblapack-dev
+        sudo apt-get install auto-97p
+        sudo apt update
+        sudo apt python3-matplotlib ipython3
+        
     - name: build shooting
       run: |
         cd shooting
         make 
+        
+    - name: Verify auto-07p installation
+      run: |
+        auto-07p --version
