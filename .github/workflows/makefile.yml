@@ -30,4 +30,4 @@ jobs:
         
     - name: Verify auto-07p installation
       run: |
-        [ -f /usr/bin/auto ] && echo "✓ Installed" || (echo "✗ Failed" && exit 1)
+        [ -f /usr/bin/auto-07p ] && echo "✓ Installed" || (echo "✗ Failed" && exit 1)
