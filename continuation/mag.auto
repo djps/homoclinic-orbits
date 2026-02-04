@@ -1,0 +1,8 @@
+#=========
+# Code mag
+#=========
+
+pgm = 'mag'
+
+print pgm, ": first run : locate a period doubling bifurcation"  
+mag=run(pgm,c='mag.1')

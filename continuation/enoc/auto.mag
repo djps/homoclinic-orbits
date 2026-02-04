@@ -1,0 +1,24 @@
+#==============
+# AUTO File Mag
+#==============
+
+# Load the files mag.f and c.mag.1 into the AUTO command interpreter.
+mag = load(equation="mag")
+mag = load("mag",constants="mag.1")
+
+# Run and store the result in the Python variable first
+first = run("mag")
+save(first,"mag.1")
+
+# Set the new start label to the first LP label in b.first and s.first
+second = run(first("UZ1"),e='mag',c='mag.2')
+save(second,"mag.2")
+
+third = run(second("UZ1"),e='mag',c='mag.3')
+save(third,"mag.3")
+
+fourth = run(second("UZ1"),e='mag',c='mag.4')
+save(fourth,"mag.4")
+
+#fifth = run(third("UZ1"),e='mag',c='mag.5')
+#save(fifth,"mag.5")

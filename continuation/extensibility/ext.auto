@@ -1,0 +1,35 @@
+#=========
+# Code ext
+#=========
+
+pgm = 'ext'
+
+print 
+print pgm, ": first run : increase truncated arc-length"  
+first = run(pgm,c='ext.1')
+save(first,'ext.1')
+dg('ext.1').writeRawFilename('firsta.dat')
+sl('ext.1')(2).writeRawFilename('firstb.dat')
+bt('ext.1')(2).writeRawFilename('firstc.dat')
+print 
+
+print pgm, ": second run : increase anisotropy"  
+second = run(first('UZ1'),c='ext.2')
+save(second,'ext.2')
+dg('ext.2').writeRawFilename('second.dat')
+print 
+
+print pgm, ": third run : increase extensibility"  
+third = run(second('UZ1'),c='ext.3')
+save(third,'ext.3')
+dg('ext.3').writeRawFilename('third.dat')
+print 
+
+print pgm, ": fourth run : increase loading"  
+fourth = run(third('UZ1'),c='ext.4')
+save(fourth,'ext.4')
+dg('ext.4').writeRawFilename('fourth.dat')
+print 
+
+
+
