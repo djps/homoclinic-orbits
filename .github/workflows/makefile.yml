@@ -20,7 +20,7 @@ jobs:
         sudo apt-get install -y gfortran
         sudo apt-get install -y make libmotif-dev libsoqt520-dev
         sudo apt-get install -y libblas-dev liblapack-dev
-        sudo apt-get install auto-97p
+        sudo apt-get install auto-07p
         sudo apt python3-matplotlib ipython3
         
     - name: build shooting
@@ -30,4 +30,4 @@ jobs:
         
     - name: Verify auto-07p installation
       run: |
-        auto-07p --version
+        [ -f /usr/bin/auto ] && echo "✓ Installed" || (echo "✗ Failed" && exit 1)
