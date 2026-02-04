@@ -21,7 +21,7 @@ jobs:
         sudo apt-get install -y make libmotif-dev libsoqt520-dev
         sudo apt-get install -y libblas-dev liblapack-dev
         sudo apt-get install auto-07p
-        sudo apt python3-matplotlib ipython3
+        sudo apt-get install python3-matplotlib ipython3
         
     - name: build shooting
       run: |
