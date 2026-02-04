@@ -16,5 +16,7 @@ jobs:
         sudo apt-get install libblas-dev liblapack-dev
     - name: checkout repo
       uses: actions/checkout@v3    
-    - name: build application
-      run: make 
+    - name: build shooting
+      run: |
+        cd shooting
+        make 
